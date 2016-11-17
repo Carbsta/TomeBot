@@ -13,3 +13,7 @@ Also you will need to include a file called "token.json" and in it will need to 
 
 I'm not a lawyer, but if anyone from Wizards of the Coast are reading this and are unhappy with something let me know,
 I'm trying to make sure the bot only uses SRD content but if anything needs removing just let me know and I can remove it.
+
+*Note on uptime*
+The bot will be running on a proper server once it has left the early alpha testing phase, and should hopefully have fairly decent uptime.
+If you don't want to wait for a stable version of TomeBot feel free to use the source as I described to run your own version with your own discord bot account.
