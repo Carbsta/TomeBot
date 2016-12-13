@@ -60,6 +60,13 @@ class TomeBot(discord.Client):
         ?monsterinfo - get information about a specific dnd 5e monster
         ?dminfo - like monsterinfo, but also gives stats such as armor class, hp etc.
 
+        To find this bot in its main server (which it was built for) join here:
+        https://discord.gg/25bf5NT
+
+        also on github too!
+        https://github.com/Carbsta/TomeBot
+        If you want to help me implement Volo's, or work on the SRD version come find me here.
+
         To add to your server use this link:
         https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&permissions=0
         (it doesn't require any permisions and never will)
