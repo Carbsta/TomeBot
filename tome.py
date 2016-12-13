@@ -110,6 +110,8 @@ class TomeBot(discord.Client):
             rolls = rolls[:-2]+". Total = "+str(total)
         else:
             rolls = rolls[:-2]+". "+modifiersign+" "+modifierint+". Total = "+str(ops[modifiersign](total,int(modifierint)))
+
+        return([rolls])
             
 
     def spellinfo(self, message):
