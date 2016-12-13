@@ -77,14 +77,36 @@ class TomeBot(discord.Client):
     def roll(self, message):
         words = message.content.split(" ")
         dicenumbers = words[1].split("d")
+        try:
+            modifierint = words[2][1:]
+            modifiersign = words[2][:1]
+        except:
+            modifierint = ""
+            modifiersign = ""
         total = 0
         rolls = "Rolls are: "
         for x in (range(0,int(dicenumbers[0]))):
-            roll = random.randint(1,int(dicenumbers[1]))
+            if "+" in dicenumbers[1]:
+                values = dicenumbers[1].split("+")
+                roll = random.randint(1,int(values[0]))
+                rolls += str(roll)+"+"+values[1]
+                roll = roll + int(values[1])
+                rolls += "="+str(roll)+", "
+            elif "-" in dicenumbers[1]:
+                values = dicenumbers[1].split("-")
+                roll = random.randint(1,int(values[0]))
+                rolls += str(roll)+"-"+values[1]
+                roll = roll - int(values[1])
+                rolls += "="+str(roll)+", "
+            else:
+                roll = random.randint(1,int(dicenumbers[1]))
+                rolls += str(roll)+", "
             total += roll
-            rolls += str(roll)+", "
-        rolls = rolls[:-2]+". Total = "+str(total)
-        return([rolls])
+        if modifiersign == "":
+            rolls = rolls[:-2]+". Total = "+str(total)
+        else:
+            rolls = rolls[:-2]+". "+modifiersign+" "+modifierint+". Total = "+str(ops[modifiersign](total,int(modifierint)))
+            
 
     def spellinfo(self, message):
         searchterm = message.content.split(' ',1)[1].lower()
