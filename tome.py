@@ -2,6 +2,10 @@ import asyncio
 import discord
 import json
 import random
+import operator
+
+#operator look up table for the diceroller
+ops = {"+":operator.add,"-":operator.sub}
 
 license = {}
 with open('license.json','r') as fp:
