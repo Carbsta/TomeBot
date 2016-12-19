@@ -92,30 +92,32 @@ class TomeBot(discord.Client):
                 modifiersign = ""
             total = 0
             rolls = "Rolls are: "
-            for x in (range(0,int(dicenumbers[0]))):
-                if "+" in dicenumbers[1]:
-                    values = dicenumbers[1].split("+")
-                    roll = random.randint(1,int(values[0]))
-                    rolls += str(roll)+"+"+values[1]
-                    roll = roll + int(values[1])
-                    rolls += "="+str(roll)+", "
-                elif "-" in dicenumbers[1]:
-                    values = dicenumbers[1].split("-")
-                    roll = random.randint(1,int(values[0]))
-                    rolls += str(roll)+"-"+values[1]
-                    roll = roll - int(values[1])
-                    rolls += "="+str(roll)+", "
+            if len(dicenumbers[0]) < 4:
+                for x in (range(0,int(dicenumbers[0]))):
+                    if "+" in dicenumbers[1]:
+                        values = dicenumbers[1].split("+")
+                        roll = random.randint(1,int(values[0]))
+                        rolls += str(roll)+"+"+values[1]
+                        roll = roll + int(values[1])
+                        rolls += "="+str(roll)+", "
+                    elif "-" in dicenumbers[1]:
+                        values = dicenumbers[1].split("-")
+                        roll = random.randint(1,int(values[0]))
+                        rolls += str(roll)+"-"+values[1]
+                        roll = roll - int(values[1])
+                        rolls += "="+str(roll)+", "
+                    else:
+                        roll = random.randint(1,int(dicenumbers[1]))
+                        rolls += str(roll)+", "
+                    total += roll
+                if modifiersign == "":
+                    rolls = rolls[:-2]+". Total = "+str(total)
                 else:
-                    roll = random.randint(1,int(dicenumbers[1]))
-                    rolls += str(roll)+", "
-                total += roll
-            if modifiersign == "":
-                rolls = rolls[:-2]+". Total = "+str(total)
+                    rolls = rolls[:-2]+". "+modifiersign+" "+modifierint+". Total = "+str(ops[modifiersign](total,int(modifierint)))
+                if len(rolls)>1900:
+                    rolls = "Don't do stupid stuff with the Roll command."
             else:
-                rolls = rolls[:-2]+". "+modifiersign+" "+modifierint+". Total = "+str(ops[modifiersign](total,int(modifierint)))
-            if len(rolls)>1900:
                 rolls = "Don't do stupid stuff with the Roll command."
-
         except:
             rolls = "Don't do stupid stuff with the Roll command."
         return([rolls])
