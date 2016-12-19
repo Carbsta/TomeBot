@@ -7,20 +7,24 @@ import operator
 #operator look up table for the diceroller
 ops = {"+":operator.add,"-":operator.sub}
 
+path = os.path.abspath("license.json")
 license = {}
-with open('license.json','r') as fp:
+with open(path,'r') as fp:
     license = json.load(fp)
 
+path = os.path.abspath("spells.json")
 spells = {}
-with open('spells.json','r') as fp:
+with open(path,'r') as fp:
     spells = json.load(fp)
 
+path = os.path.abspath("monsters.json")
 monsters = {}
-with open('monsters.json','r') as fp:
+with open(path,'r') as fp:
     monsters = json.load(fp)
 
+path = os.path.abspath("token.json")
 tokens = {}
-with open('token.json','r') as fp:
+with open(path,'r') as fp:
     tokens = json.load(fp)
 
 token = tokens['token']
