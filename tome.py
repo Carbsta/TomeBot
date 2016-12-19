@@ -3,30 +3,46 @@ import discord
 import json
 import random
 import operator
-import os
 
 #operator look up table for the diceroller
 ops = {"+":operator.add,"-":operator.sub}
 
-path = os.path.abspath("license.json")
+path1 = ""
 license = {}
-with open(path,'r') as fp:
-    license = json.load(fp)
+try:
+    with open("license.json",'r') as fp:
+        license = json.load(fp)
+except:
+    with open(path1,'r') as fp:
+        license = json.load(fp)
 
-path = os.path.abspath("spells.json")
+
+path2 = ""
 spells = {}
-with open(path,'r') as fp:
-    spells = json.load(fp)
+try:
+    with open("spells.json",'r') as fp:
+        spells = json.load(fp)
+except:
+    with open(path2,'r') as fp:
+        spells = json.load(fp)
 
-path = os.path.abspath("monsters.json")
+path3 = ""
 monsters = {}
-with open(path,'r') as fp:
-    monsters = json.load(fp)
+try:
+    with open("monsters.json",'r') as fp:
+        monsters = json.load(fp)
+except:
+    with open(path3,'r') as fp:
+        monsters = json.load(fp)
 
-path = os.path.abspath("token.json")
+path4 = ""
 tokens = {}
-with open(path,'r') as fp:
-    tokens = json.load(fp)
+try:
+    with open("token.json",'r') as fp:
+        tokens = json.load(fp)
+except:
+    with open(path4,'r') as fp:
+        tokens = json.load(fp)
 
 token = tokens['token']
 
