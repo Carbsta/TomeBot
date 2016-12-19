@@ -71,6 +71,8 @@ class TomeBot(discord.Client):
         https://github.com/Carbsta/TomeBot
         If you want to help me implement Volo's, or work on the SRD version come find me here.
 
+        Hosted by @Crablabuk.
+
         To add to your server use this link:
         https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&permissions=0
         (it doesn't require any permisions and never will)
@@ -79,40 +81,44 @@ class TomeBot(discord.Client):
 
 
     def roll(self, message):
-        words = message.content.split(" ")
-        dicenumbers = words[1].split("d")
         try:
-            modifierint = words[2][1:]
-            modifiersign = words[2][:1]
-        except:
-            modifierint = ""
-            modifiersign = ""
-        total = 0
-        rolls = "Rolls are: "
-        for x in (range(0,int(dicenumbers[0]))):
-            if "+" in dicenumbers[1]:
-                values = dicenumbers[1].split("+")
-                roll = random.randint(1,int(values[0]))
-                rolls += str(roll)+"+"+values[1]
-                roll = roll + int(values[1])
-                rolls += "="+str(roll)+", "
-            elif "-" in dicenumbers[1]:
-                values = dicenumbers[1].split("-")
-                roll = random.randint(1,int(values[0]))
-                rolls += str(roll)+"-"+values[1]
-                roll = roll - int(values[1])
-                rolls += "="+str(roll)+", "
+            words = message.content.split(" ")
+            dicenumbers = words[1].split("d")
+            try:
+                modifierint = words[2][1:]
+                modifiersign = words[2][:1]
+            except:
+                modifierint = ""
+                modifiersign = ""
+            total = 0
+            rolls = "Rolls are: "
+            for x in (range(0,int(dicenumbers[0]))):
+                if "+" in dicenumbers[1]:
+                    values = dicenumbers[1].split("+")
+                    roll = random.randint(1,int(values[0]))
+                    rolls += str(roll)+"+"+values[1]
+                    roll = roll + int(values[1])
+                    rolls += "="+str(roll)+", "
+                elif "-" in dicenumbers[1]:
+                    values = dicenumbers[1].split("-")
+                    roll = random.randint(1,int(values[0]))
+                    rolls += str(roll)+"-"+values[1]
+                    roll = roll - int(values[1])
+                    rolls += "="+str(roll)+", "
+                else:
+                    roll = random.randint(1,int(dicenumbers[1]))
+                    rolls += str(roll)+", "
+                total += roll
+            if modifiersign == "":
+                rolls = rolls[:-2]+". Total = "+str(total)
             else:
-                roll = random.randint(1,int(dicenumbers[1]))
-                rolls += str(roll)+", "
-            total += roll
-        if modifiersign == "":
-            rolls = rolls[:-2]+". Total = "+str(total)
-        else:
-            rolls = rolls[:-2]+". "+modifiersign+" "+modifierint+". Total = "+str(ops[modifiersign](total,int(modifierint)))
+                rolls = rolls[:-2]+". "+modifiersign+" "+modifierint+". Total = "+str(ops[modifiersign](total,int(modifierint)))
+            if len(rolls)>1900:
+                rolls = "Don't do stupid stuff with the Roll command."
 
+        except:
+            rolls = "Don't do stupid stuff with the Roll command."
         return([rolls])
-            
 
     def spellinfo(self, message):
         searchterm = message.content.split(' ',1)[1].lower()
