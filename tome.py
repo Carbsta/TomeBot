@@ -3,6 +3,7 @@ import discord
 import json
 import random
 import operator
+import os
 
 #operator look up table for the diceroller
 ops = {"+":operator.add,"-":operator.sub}
