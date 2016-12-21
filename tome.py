@@ -7,42 +7,28 @@ import operator
 #operator look up table for the diceroller
 ops = {"+":operator.add,"-":operator.sub}
 
-path1 = ""
+#edit these values if you want to load the various json files from different folders.
+paths = {"license":"license.json","spells":"spells.json","monsters":"monsters.json","token":"token.json","log":"log.json"}
+
 license = {}
-try:
-    with open("license.json",'r') as fp:
-        license = json.load(fp)
-except:
-    with open(path1,'r') as fp:
-        license = json.load(fp)
+with open(paths["license"],'r') as fp:
+    license = json.load(fp)
 
-
-path2 = ""
 spells = {}
-try:
-    with open("spells.json",'r') as fp:
-        spells = json.load(fp)
-except:
-    with open(path2,'r') as fp:
-        spells = json.load(fp)
+with open(paths["spells"],'r') as fp:
+    spells = json.load(fp)
 
-path3 = ""
 monsters = {}
-try:
-    with open("monsters.json",'r') as fp:
-        monsters = json.load(fp)
-except:
-    with open(path3,'r') as fp:
-        monsters = json.load(fp)
+with open(paths["monsters"],'r') as fp:
+    monsters = json.load(fp)
 
-path4 = ""
 tokens = {}
-try:
-    with open("token.json",'r') as fp:
-        tokens = json.load(fp)
-except:
-    with open(path4,'r') as fp:
-        tokens = json.load(fp)
+with open(paths["token"],'r') as fp:
+    tokens = json.load(fp)
+
+log = {}
+with open(paths["log"],'r') as fp:
+    log = json.load(fp)
 
 token = tokens['token']
 
@@ -53,14 +39,14 @@ class TomeBot(discord.Client):
         self.GamePlaying.name = "Type ?commands"
 
     async def on_message(self, message):
-        output = ""
-        try:
-            output = output + message.server.name + " - " + message.channel.name + " - "
-        except:
-            output = output + "Private Message - "
-        output = output + message.author.name + " (" + str(message.timestamp) + ") :\n" + message.content
-        print(output)
         if message.content.startswith("?"):
+            try:
+                messagelog = {"messageID":message.id,"userID":message.author.id,"username":message.author.name,"timestamp":str(message.timestamp),"content":message.content,"serverID":message.server.id,"servername":message.server.name,"channelID":message.channel.id,"channelname":message.channel.name,"privatemessage":False}
+            except:
+                messagelog = {"messageID":message.id,"userID":message.author.id,"username":message.author.name,"timestamp":str(message.timestamp),"content":message.content,"privatemessage":True}
+            log.append(messagelog)
+            with open(paths["log"],'w') as fp:
+                json.dump(log, fp)
             command = (message.content.split(' ',1)[0])[1:]
             if hasattr(self, command):
                 response = getattr(self, command)(message)
@@ -77,27 +63,28 @@ class TomeBot(discord.Client):
         await self.change_status(self.GamePlaying, idle = False)
 
     def commands(self, message):
-        response= """Commands:
-        ?roll - roll dice, syntax ?roll xdy
-        ?spellsearch - search for a dnd 5e spell
-        ?spellinfo - get information about a specific dnd 5e spell
-        ?monstersearch - search for a dnd 5e monster
-        ?monsterinfo - get information about a specific dnd 5e monster
-        ?dminfo - like monsterinfo, but also gives stats such as armor class, hp etc.
+        response= """
+Commands:
+?roll - roll dice, syntax ?roll xdy
+?spellsearch - search for a dnd 5e spell
+?spellinfo - get information about a specific dnd 5e spell
+?monstersearch - search for a dnd 5e monster
+?monsterinfo - get information about a specific dnd 5e monster
+?dminfo - like monsterinfo, but also gives stats such as armor class, hp etc.
 
-        To find this bot in its main server (which it was built for) join here:
-        https://discord.gg/25bf5NT
+To find this bot in its main server (which it was built for) join here:
+https://discord.gg/25bf5NT
 
-        also on github too!
-        https://github.com/Carbsta/TomeBot
-        If you want to help me implement Volo's, or work on the SRD version come find me here.
+also on github too!
+https://github.com/Carbsta/TomeBot
+If you want to help me implement Volo's, or work on the SRD version come find me here.
 
-        Hosted by @Crablabuk.
+Hosted by @Crablabuk.
 
-        To add to your server use this link:
-        https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&permissions=0
-        (it doesn't require any permisions and never will)
-        """
+To add to your server use this link:
+https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&permissions=0
+(it doesn't require any permisions and never will)
+"""
         return([response])
 
 
