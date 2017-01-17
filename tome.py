@@ -39,7 +39,10 @@ class TomeBot(discord.Client):
         self.GamePlaying.name = "Type ?commands"
 
     async def on_message(self, message):
+        global log
         if message.content.startswith("?"):
+            if len(log) > 9:
+                log = log[-9:]
             try:
                 messagelog = {"messageID":message.id,"userID":message.author.id,"username":message.author.name,"timestamp":str(message.timestamp),"content":message.content,"serverID":message.server.id,"servername":message.server.name,"channelID":message.channel.id,"channelname":message.channel.name,"privatemessage":False}
             except:
@@ -156,21 +159,58 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
         return(results)
 
     def spellsearch(self, message):
-        searchterm = message.content.split(' ',1)[1].lower()
+        searchterms = message.content.split(' ',1)[1].lower()
+        searchterms = searchterms.split(", ")
         results = "Results: \n"
-        for x in spells:
-            if searchterm in x['name'].lower():
-                results = results+x['name']+"\n"
+        for spell in spells:
+            matches = 0
+            for term in searchterms:
+                if term in spell['name'].lower():
+                    matches = matches + 1
+                elif term in spell['class'].lower():
+                    matches = matches + 1
+                elif term in spell['school'].lower():
+                    matches = matches + 1
+                elif term in spell['duration'].lower():
+                    matches = matches + 1
+                elif term in spell['range'].lower():
+                    matches = matches + 1
+                elif ", M" in spell["components"]:
+                    if term in spell["material"]:
+                        matches = matches + 1
+            if matches == len(searchterms):
+                results = results+spell['name']+"\n"
+        if len(results)>1990:
+            results = "Too many results found, try narrowing your search with more search terms."
         return([results])
 
     def monstersearch(self,message):
         searchterm = message.content.split(' ',1)[1].lower()
+        searchterm = searchterm.split(", ")
         results = "Results: \n"
-        for x in monsters:
-            if searchterm in x['name'].lower():
-                results = results+x['name']+"\n"
+        for monster in monsters:
+            matches = 0
+            for term in searchterm:
+                if term in monster['name'].lower():
+                    matches = matches + 1
+                elif term in monster['size'].lower():
+                    matches = matches + 1
+                elif term in monster['type'].lower():
+                    matches = matches + 1
+                elif term in monster['subtype'].lower():
+                    matches = matches + 1
+                elif term in monster['alignment'].lower():
+                    matches = matches + 1
+                elif term in monster['senses'].lower():
+                    matches = matches + 1
+                elif term in monster['languages'].lower():
+                    matches = matches + 1
+            if matches == len(searchterm):
+                results = results+monster['name']+"\n"
+        if len(results)>1990:
+            results = "Too many results found, try narrowing your search with more search terms."
         return([results])
-
+        
     def monsterinfo(self,message):
         searchterm = message.content.split(' ',1)[1].lower()
         result = "Could not find that monster, use ?monstersearch to get monster names."
