@@ -171,6 +171,8 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                     matches = matches + 1
                 elif term in spell['school'].lower():
                     matches = matches + 1
+                elif term in spell['level'].lower():
+                    matches = matches + 1
                 elif term in spell['duration'].lower():
                     matches = matches + 1
                 elif term in spell['range'].lower():
