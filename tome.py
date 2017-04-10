@@ -63,7 +63,7 @@ class TomeBot(discord.Client):
         print(self.user.name)
         print(self.user.id)
         print('------')
-        await self.change_status(self.GamePlaying, idle = False)
+        await self.change_presence(game=self.GamePlaying)
 
     def commands(self, message):
         response= """
@@ -341,6 +341,13 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                 results.insert(index,secondpart)
                 results.insert(index,firstpart)
         return(results)
+
+    def guilds(self,message):
+        inguilds = 0
+        for sever in self.servers:
+            inguilds = inguilds + 1
+        response = "In "+str(inguilds)+" guild(s)."
+        return([response])
 
 bot = TomeBot()
 bot.run(token)
