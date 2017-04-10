@@ -36,7 +36,7 @@ class TomeBot(discord.Client):
     def __init__(self):
         super().__init__()
         self.GamePlaying = discord.Game()
-        self.GamePlaying.name = "Type ?commands"
+        self.GamePlaying.name = "Type ?info"
 
     async def on_message(self, message):
         global log
@@ -53,9 +53,12 @@ class TomeBot(discord.Client):
             command = (message.content.split(' ',1)[0])[1:]
             if hasattr(self, command):
                 response = getattr(self, command)(message)
-                if response[0] != None:
-                    for a in response:
-                        await self.send_message(message.channel, a)
+                if type(response) is list:
+                    if response[0] != None:
+                        for a in response:
+                            await self.send_message(message.channel, a)
+                else:
+                    await self.send_message(message.channel,embed=response)
 
 
     async def on_ready(self):
@@ -66,29 +69,54 @@ class TomeBot(discord.Client):
         await self.change_presence(game=self.GamePlaying)
 
     def commands(self, message):
-        response= """
+        if message.content.lower().endswith("-p"):
+            response= """
 Commands:
 ?roll - roll dice, syntax ?roll xdy
 ?spellsearch - search for a dnd 5e spell
 ?spellinfo - get information about a specific dnd 5e spell
 ?monstersearch - search for a dnd 5e monster
 ?monsterinfo - get information about a specific dnd 5e monster
-?dminfo - like monsterinfo, but also gives stats such as armor class, hp etc.
+suffixes: -p (plain) forces responses to be in plaintext without embeds.
+"""
+            return([response])
+        else:
+            response = discord.Embed()
+            response.colour = discord.Colour.dark_purple()
+            response.title = "Bot Commands"
+            response.type = "rich"
+            response.add_field(name="?roll",value="Rolls dice. Can add or subtract modifiers to individual dice or the total of the rolls.\n \"?roll xdy+z\" - adds modifier to each dice.\n \"?roll xdy +z\" - adds modifier to the total.",inline=False)
+            response.add_field(name="?spellsearch",value="Searches for a 5e spell.\nNot case sensitive, and uses metadata to help you search.\nYou can search by class, level, name, components, range and more.\nSeperate search terms with commas.\n \"?spellsearch 1st, Bard, touch\" - searches for 1st level Bard spells with a range of touch.",inline=False)
+            response.add_field(name="?spellinfo",value="Gives information about a spell.\nNot case sensitive, but does have to be spelt correctly.\n \"?spellinfo Cure Wounds\"",inline=False)
+            response.add_field(name="?monstersearch",value="Same as spellsearch, but for 5e monsters\nAlso works with metadata such as size, challenge rating, etc.",inline=False)
+            response.add_field(name="?monsterinfo",value="Same as spellinfo, but for 5e monsters.",inline=False)
+            response.add_field(name="?info",value="Show information about the bot.",inline=False)
+            response.add_field(name="suffixes",value="Use -p (stands for plain) to use a command without it returing an embed.\nFor those who have link embeds turned off in their discord settings.\n \"?commands -p\" displays this page in a non embed format.",inline=False)
+            return(response)
 
-To find this bot in its main server (which it was built for) join here:
+    def info(self, message):
+        inguilds = 0
+        for sever in self.servers:
+            inguilds = inguilds + 1
+        response = """
+Type ?commands to see the commands.
+Add the suffix -p to disable embeds.
+?commands -p
+
+Find the owner of the Bot here:
 https://discord.gg/25bf5NT
 
-also on github too!
+also on github:
 https://github.com/Carbsta/TomeBot
-If you want to help me implement Volo's, or work on the SRD version come find me here.
 
 Hosted by @Crablabuk.
 
 To add to your server use this link:
 https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&permissions=0
-(it doesn't require any permisions and never will)
 """
+        response = response +"\n\nCurrently in "+str(inguilds)+" discord server(s)."
         return([response])
+
 
 
     def roll(self, message):
@@ -134,32 +162,99 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
         return([rolls])
 
     def spellinfo(self, message):
-        searchterm = message.content.split(' ',1)[1].lower()
+        noembed = False
+        words = message.content
+        if message.content.endswith("-p"):
+            noembed = True
+            words = words.strip(" -p")
+            words = words.strip("-p")
+        searchterm = words.split(' ',1)[1].lower()
         results = []
         result = "Could not find that spell, use ?spellsearch to get spell names."
+        embedresult = discord.Embed()
+        embedresult.type = "rich"
+        embedresult.colour = discord.Colour.dark_purple()
+        embedresult.add_field(name="No spell found",value="Use ?spellsearch to get spell names.",inline=False)
         for x in spells:
             if searchterm == x['name'].lower():
                 result = x['name']+"\n\n"+x['level']+"\n\nDescription: \n"+x['desc']
+                embedresult.clear_fields()
+                embedresult.title = x['name']
+                embedresult.add_field(name=x['level'],value="\u200b",inline=False)
+                desc = x['desc']
+                if(len(desc)<=1000):
+                    embedresult.add_field(name="Description:",value=x["desc"],inline=False)
+                else:
+                    correctLength = False
+                    #take desc and remove the first 1000 chars, storing the first 1000 as one item.
+                    descarray = []
+                    while correctLength == False:
+                        item = desc[0:1000]
+                        descarray.append(item)
+                        desc = desc[1000:]
+                        if len(desc) <= 1000:
+                            correctLength = True
+                            item = desc
+                            descarray.append(item)
+                    for z in descarray:
+                        if(descarray.index(z)==0):
+                            embedresult.add_field(name="Description:",value=z,inline=False)
+                        else:
+                            embedresult.add_field(name="\u200b",value=z,inline=False)
+                
                 try:
                     result = result + "\n" + x['higher_level']
+                    embedresult.add_field(name="Higher Levels:",value=x['higher_level'],inline=False)
                 except:
                     result = result
+                    embedresult = embedresult
                 result = result + "\nCasting time: "+x['casting_time']+"\nDuration: "+x['duration']+"\nRange: "+x['range']
                 result = result + "\n\nConcentration: "+x['concentration']+"\nRitual: "+x['ritual']+"\n\nComponents: "+x['components']
+                embedresult.add_field(name="Casting time:",value=x['casting_time'],inline=False)
+                embedresult.add_field(name="Duration:",value=x['duration'],inline=False)
+                embedresult.add_field(name="Range:",value=x['range'],inline=False)
+                embedresult.add_field(name="Concentration:",value=x['concentration'],inline=False)
+                embedresult.add_field(name="Ritual:",value=x['ritual'],inline=False)
+                embedresult.add_field(name="Components:",value=x['components'],inline=False)
                 try:
                     result = result + "\nMaterials: "+x['material']
+                    embedresult.add_field(name="Materials:",value=x['material'],inline=False)
                 except:
                     result = result
+                    embedresult = embedresult
                 result = result + "\n\nClass: "+x['class']
+                embedresult.add_field(name="Class:",value=x['class'],inline=False)
         results = [result]
-        if len(result)>1999:
-            firstpart, secondpart = result[:len(result)//2], result[len(result)//2:]
-            results = [firstpart,secondpart]
+        #for z in results:
+        #    if (len(z)>1999):
+        #        results[results.index(z)]=z[:1999]
+        #        results.append(z[1999:])
+        if (len(result)>=2000):
+            correctLength = False
+            #take desc and remove the first 1000 chars, storing the first 1000 as one item.
+            results = []
+            while correctLength == False:
+                item = result[0:2000]
+                results.append(item)
+                result = result[2000:]
+                if len(result) <= 2000:
+                    correctLength = True
+                    item = result
+                    results.append(item)
+        # if len(result)>1999:
+        #     firstpart, secondpart = result[:len(result)//2], result[len(result)//2:]
+        #     results = [firstpart,secondpart]
 
-        return(results)
+        if noembed == False:
+            return(embedresult)
+        else:
+            return(results)
 
     def spellsearch(self, message):
-        searchterms = message.content.split(' ',1)[1].lower()
+        words = message.content
+        if words.endswith("-p"):
+            words = words[:-2]
+        searchterms = words.split(' ',1)[1].lower()
         searchterms = searchterms.split(", ")
         results = "Results: \n"
         for spell in spells:
@@ -341,13 +436,6 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                 results.insert(index,secondpart)
                 results.insert(index,firstpart)
         return(results)
-
-    def guilds(self,message):
-        inguilds = 0
-        for sever in self.servers:
-            inguilds = inguilds + 1
-        response = "In "+str(inguilds)+" guild(s)."
-        return([response])
 
 bot = TomeBot()
 bot.run(token)
