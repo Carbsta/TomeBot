@@ -404,18 +404,28 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                     abilitiestitle = "**Special abilities:**\n\n"
                     abilities = ""
                     for y in x['special_abilities']:
-                        abilities = abilities + y['name']+"\n"+y['desc']+"\nAttack bonus: "+str(y['attack_bonus'])+"\n\n"
+                        abilities = abilities +"**"+ y['name']+"**\n"+y['desc']+"\nAttack bonus: "+str(y['attack_bonus'])+"\n\n"
                 except:
                     abilitiestitle = ""
                     abilities = "No special abilities."
                 if (len(abilities)<1000):
                     embedresult.add_field(name="Special Abilities:",value=abilities,inline=False)
+                else:
+                    embedabilitiesarray = abilities.split("\n\n")
+                    for b in embedabilitiesarray:
+                        if re.search('[a-zA-Z]', b):
+                            if(embedabilitiesarray.index(b)==0):
+                                if (len(b)<1000):
+                                    embedresult.add_field(name="Special Abilities:",value=b,inline=False)
+                            else:
+                                if (len(b)<1000):
+                                    embedresult.add_field(name="\u200b",value=b,inline=False)
                 abilities = abilitiestitle + abilities
                 try:
                     actionstitle = "**Actions:**\n\n"
                     actions = ""
                     for z in x['actions']:
-                        actions = actions + z['name']+"\n"+z['desc']+"\nAttack bonus: "+str(z['attack_bonus'])
+                        actions = actions +"**"+ z['name']+"**\n"+z['desc']+"\nAttack bonus: "+str(z['attack_bonus'])
                         try:
                             actions = actions + "\nDamage dice: "+z['damage_dice']
                         except:
@@ -446,7 +456,7 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                     legendaryactionstitle = "**Legendary Actions:**\n\n"
                     legendaryactions = ""
                     for w in x['legendary_actions']:
-                        legendaryactions = legendaryactions + w['name']+"\n"+w['desc']+"\nAttack bonus: "+str(w['attack_bonus'])
+                        legendaryactions = legendaryactions +"**"+ w['name']+"**\n"+w['desc']+"\nAttack bonus: "+str(w['attack_bonus'])
                         try:
                             legendaryactions = legendaryactions + "\nDamage dice: "+w['damage_dice']
                         except:
@@ -461,6 +471,16 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                     legendaryactions = "No legendary actions"
                 if (len(legendaryactions)<1000):
                     embedresult.add_field(name="Legendary Actions:",value=legendaryactions,inline=False)
+                else:
+                    embedlegendaryactionsarray = actions.split("\n\n")
+                    for c in embedlegendaryactionsarray:
+                        if re.search('[a-zA-Z]', c):
+                            if(embedlegendaryactionsarray.index(c)==0):
+                                if (len(c)<1000):
+                                    embedresult.add_field(name="Legendary Actions:",value=c,inline=False)
+                            else:
+                                if (len(c)<1000):
+                                    embedresult.add_field(name="\u200b",value=c,inline=False)
                 legendaryactions = legendaryactionstitle + legendaryactions
 
         if noembed == False:
