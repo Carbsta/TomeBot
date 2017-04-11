@@ -3,6 +3,7 @@ import discord
 import json
 import random
 import operator
+import re
 
 #operator look up table for the diceroller
 ops = {"+":operator.add,"-":operator.sub}
@@ -36,7 +37,7 @@ class TomeBot(discord.Client):
     def __init__(self):
         super().__init__()
         self.GamePlaying = discord.Game()
-        self.GamePlaying.name = "Type ?info"
+        self.GamePlaying.name = "Type ?commands"
 
     async def on_message(self, message):
         global log
@@ -185,22 +186,15 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                 if(len(desc)<=1000):
                     embedresult.add_field(name="Description:",value=x["desc"],inline=False)
                 else:
-                    correctLength = False
-                    #take desc and remove the first 1000 chars, storing the first 1000 as one item.
-                    descarray = []
-                    while correctLength == False:
-                        item = desc[0:1000]
-                        descarray.append(item)
-                        desc = desc[1000:]
-                        if len(desc) <= 1000:
-                            correctLength = True
-                            item = desc
-                            descarray.append(item)
-                    for z in descarray:
-                        if(descarray.index(z)==0):
-                            embedresult.add_field(name="Description:",value=z,inline=False)
-                        else:
-                            embedresult.add_field(name="\u200b",value=z,inline=False)
+                    descarray = desc.split("\n")
+                    for a in descarray:
+                        if re.search('[a-zA-Z]', a):
+                            if(descarray.index(a)==0):
+                                if (len(a)<1000):
+                                    embedresult.add_field(name="Description:",value=a,inline=False)
+                            else:
+                                if (len(a)<1000):
+                                    embedresult.add_field(name="\u200b",value=a,inline=False)
                 
                 try:
                     result = result + "\n" + x['higher_level']
@@ -225,13 +219,8 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                 result = result + "\n\nClass: "+x['class']
                 embedresult.add_field(name="Class:",value=x['class'],inline=False)
         results = [result]
-        #for z in results:
-        #    if (len(z)>1999):
-        #        results[results.index(z)]=z[:1999]
-        #        results.append(z[1999:])
         if (len(result)>=2000):
             correctLength = False
-            #take desc and remove the first 1000 chars, storing the first 1000 as one item.
             results = []
             while correctLength == False:
                 item = result[0:2000]
@@ -241,9 +230,6 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                     correctLength = True
                     item = result
                     results.append(item)
-        # if len(result)>1999:
-        #     firstpart, secondpart = result[:len(result)//2], result[len(result)//2:]
-        #     results = [firstpart,secondpart]
 
         if noembed == False:
             return(embedresult)
@@ -308,7 +294,7 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
             results = "Too many results found, try narrowing your search with more search terms."
         return([results])
         
-    def monsterinfo(self,message):
+    def deprecated(self,message):
         searchterm = message.content.split(' ',1)[1].lower()
         result = "Could not find that monster, use ?monstersearch to get monster names."
         abilities = "No special abilities"
@@ -351,59 +337,43 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
         return(results)
 
     def dminfo(self,message):
+        response = "dminfo is now deprecated, ?monsterinfo now displays everything dminfo used to display."
+        return([response])
+
+    def monsterinfo(self,message):
+        noembed = False
         searchterm = message.content.split(' ',1)[1].lower()
+        if message.content.endswith("-p"):
+            noembed = True
+            searchterm = searchterm.strip(" -p")
+            searchterm = searchterm.strip("-p")
         result = "Could not find that monster, use ?monstersearch to get monster names."
         stats = "No stats"
         abilities = "No special abilities"
         actions = "No actions"
         legendaryactions = "No legendary actions"
+        embedresult = discord.Embed()
+        embedresult.type = "rich"
+        embedresult.colour = discord.Colour.dark_purple()
+        embedresult.add_field(name="No monster found",value="Use ?monstersearch to get monster names.",inline=False)
         for x in monsters:
             if searchterm == x['name'].lower():
-                result = "**"+x['name']+"**\n\n"+"Size: "+x['size']+"\nChallenge Rating: "+x['challenge_rating']+"\nType: "+x['type']
+                #generate name and info fields
+                embedresult.clear_fields()
+                resulttitle = "**"+x['name']+"**\n\n"
+                result = "Size: "+x['size']+"\nChallenge Rating: "+x['challenge_rating']+"\nType: "+x['type']
                 if x['subtype'] != "":
                     result = result + "\nSubtype: "+x['subtype']
                 result = result +"\nAlignment: "+x['alignment']+"\nSenses: "+x['senses']+"\nLanguages: "+x['languages']
-                try:
-                    abilities = "**Special abilities:**\n\n"
-                    for y in x['special_abilities']:
-                        abilities = abilities + y['name']+"\n"+y['desc']+"\nAttack bonus: "+str(y['attack_bonus'])+"\n\n"
-                except:
-                    abilities = "No special abilities"
-                try:
-                    actions = "**Actions:**\n\n"
-                    for z in x['actions']:
-                        actions = actions + z['name']+"\n"+z['desc']+"\nAttack bonus: "+str(z['attack_bonus'])
-                        try:
-                            actions = actions + "\nDamage dice: "+z['damage_dice']
-                        except:
-                            actions = actions
-                        try:
-                            actions = actions + "\nDamage bonus: "+z['damage_bonus']+"\n\n"
-                        except:
-                            actions = actions
-                        actions = actions + "\n\n"
-                except:
-                    actions = "No actions"
-                try:
-                    legendaryactions = "**Legendary Actions:**\n\n"
-                    for w in x['legendary_actions']:
-                        legendaryactions = legendaryactions + w['name']+"\n"+w['desc']+"\nAttack bonus: "+str(w['attack_bonus'])
-                        try:
-                            legendaryactions = legendaryactions + "\nDamage dice: "+w['damage_dice']
-                        except:
-                            legendaryactions = legendaryactions
-                        try:
-                            legendaryactions = legendaryactions + "\nDamage bonus: "+w['damage_bonus']+"\n\n"
-                        except:
-                            legendaryactions = legendaryactions
-                        legendaryactions = legendaryactions + "\n\n"
-                except:
-                    legendaryactions = "No legendary actions"
+                embedresult.add_field(name=x['name'],value=result,inline=False)
+                result = resulttitle + result
 
-                stats = "**Stats:**\n\n"+"Armor class: "+str(x['armor_class'])+"\nHit points: "+str(x['hit_points'])+"\nHit dice: "+x['hit_dice']
+                #generate stat fields
+                statstitle = "**Stats:**\n\n"
+                stats = "Armor class: "+str(x['armor_class'])+"\nHit points: "+str(x['hit_points'])+"\nHit dice: "+x['hit_dice']
                 stats = stats+"\n\nSpeed: "+x['speed']+"\n\nStrength: "+str(x['strength'])+"\nDexterity: "+str(x['dexterity'])
                 stats = stats+"\nConstitution: "+str(x['constitution'])+"\nIntelligence: "+str(x['intelligence'])+"\nWisdom: "+str(x['wisdom'])
-                stats = stats+"\nCharisma: "+str(x['charisma'])+"\n\n"
+                stats = stats+"\nCharisma: "+str(x['charisma'])+"\n"
 
                 #getting all the random shit crazy stats that are different for each monster -.-"
                 skills = ["Acrobatics","Arcana","Athletics","Deception","History","Insight","Intimidation","Investigation","Medicine","Nature","Perception","Performance","Persuasion","Religion","Stealth","Survival"]
@@ -426,8 +396,79 @@ https://discordapp.com/oauth2/authorize?client_id=247413966094073856&scope=bot&p
                     stat = x.get(resistance.lower())
                     if stat != "":
                         stats = stats + resistance +": "+stat+"\n"
+                embedresult.add_field(name="Stats:",value=stats,inline=False)
+                stats = statstitle + stats
+
+                #special abilites, actions and legendary actions.
+                try:
+                    abilitiestitle = "**Special abilities:**\n\n"
+                    abilities = ""
+                    for y in x['special_abilities']:
+                        abilities = abilities + y['name']+"\n"+y['desc']+"\nAttack bonus: "+str(y['attack_bonus'])+"\n\n"
+                except:
+                    abilitiestitle = ""
+                    abilities = "No special abilities."
+                if (len(abilities)<1000):
+                    embedresult.add_field(name="Special Abilities:",value=abilities,inline=False)
+                abilities = abilitiestitle + abilities
+                try:
+                    actionstitle = "**Actions:**\n\n"
+                    actions = ""
+                    for z in x['actions']:
+                        actions = actions + z['name']+"\n"+z['desc']+"\nAttack bonus: "+str(z['attack_bonus'])
+                        try:
+                            actions = actions + "\nDamage dice: "+z['damage_dice']
+                        except:
+                            actions = actions
+                        try:
+                            actions = actions + "\nDamage bonus: "+z['damage_bonus']+"\n\n"
+                        except:
+                            actions = actions
+                        actions = actions + "\n\n"
+                except:
+                    actionstitle = ""
+                    actions = "No actions"
+                if (len(actions)<=1000):
+                    embedresult.add_field(name="Actions:",value=actions,inline=False)
+                else:
+                    embedactionsarray = actions.split("\n\n")
+                    for a in embedactionsarray:
+                        if re.search('[a-zA-Z]', a):
+                            if(embedactionsarray.index(a)==0):
+                                if (len(a)<1000):
+                                    embedresult.add_field(name="Actions:",value=a,inline=False)
+                            else:
+                                if (len(a)<1000):
+                                    embedresult.add_field(name="\u200b",value=a,inline=False)
+                actions = actionstitle + actions
+
+                try:
+                    legendaryactionstitle = "**Legendary Actions:**\n\n"
+                    legendaryactions = ""
+                    for w in x['legendary_actions']:
+                        legendaryactions = legendaryactions + w['name']+"\n"+w['desc']+"\nAttack bonus: "+str(w['attack_bonus'])
+                        try:
+                            legendaryactions = legendaryactions + "\nDamage dice: "+w['damage_dice']
+                        except:
+                            legendaryactions = legendaryactions
+                        try:
+                            legendaryactions = legendaryactions + "\nDamage bonus: "+w['damage_bonus']+"\n\n"
+                        except:
+                            legendaryactions = legendaryactions
+                        legendaryactions = legendaryactions + "\n\n"
+                except:
+                    legendaryactionstitle = ""
+                    legendaryactions = "No legendary actions"
+                if (len(legendaryactions)<1000):
+                    embedresult.add_field(name="Legendary Actions:",value=legendaryactions,inline=False)
+                legendaryactions = legendaryactionstitle + legendaryactions
+
+        if noembed == False:
+            return(embedresult)
 
         results = [result,stats,abilities,actions,legendaryactions]
+        if (result == "Could not find that monster, use ?monstersearch to get monster names."):
+            results = [result]
         for b in results:
             if len(b)>1900:
                 firstpart, secondpart = b[:len(b)//2], b[len(b)//2:]
