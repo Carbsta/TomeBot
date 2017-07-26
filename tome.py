@@ -11,7 +11,7 @@ import operator
 #operator look up table for the diceroller
 ops = {"+":operator.add,"-":operator.sub}
 #edit these values if you want to load the various json files from different folders.
-paths = {"license":"license.json","spells":"spells.json","monsters":"monsters.json","token":"token.json","log":"log.json"}
+paths = {"license":"/root/Bots/Tome/TomeBot/license.json","spells":"/root/Bots/Tome/TomeBot/spells.json","monsters":"/root/Bots/Tome/TomeBot/monsters.json","token":"/root/Bots/Tome/TomeBot/token.json","log":"/root/Bots/Tome/TomeBot/log.json"}
 
 license = {}
 with open(paths["license"],'r') as fp:
