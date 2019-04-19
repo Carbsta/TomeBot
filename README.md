@@ -1,5 +1,14 @@
 **TomeBot**
 
+***TOMEBOT IS NO LONGER UNDER DEVELOPMENT***
+(And hasn't been for the past year and a half prior to announcing this.)
+
+I wrote this discord bot primarily to gain an understanding about writing discord bots, to improve my skills with Python, and to have fun. At the time there weren't the same amazing D&D discord bots that exist today, and I'm delighted this got any of the attention that it did, even as such a rough around the edged project. I'm going to leave this repository here, however an official version of the bot is no longer being hosted. If people want to try resurrect it, go ahead, however if you just want a good discord bot for D&D I *highly* recommend Avrae https://avrae.io/
+Avrae is essentially all I ever wanted TomeBot to be, but far futher along and developed by some passionate people, who more importantly have the time to work on such things, go check it out and contribute. (That's what I'm planning on doing.)
+Thanks for the ride!
+
+*old readme:*
+
 TomeBot is currently in early alpha.
 The goal is to produce a bot that uses the dnd 5e SRD, the pathfinder SRD and other SRDs from games with an OGL.
 The bot is designed as a reference bot to make playing these pen and paper games easier,
